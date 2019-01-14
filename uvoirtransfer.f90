@@ -15,7 +15,7 @@
       real(8) , save :: Esource,EpelletUvoir
       integer , save :: nphotons
 
-      integer , allocatable , save :: Ncreate(:) , Nleak(:) , Nprob(:), nseeds(:)
+      integer , allocatable , save :: Ncreate(:) , Nleak(:) , Nprob(:)
 
       contains
 
@@ -146,12 +146,12 @@
 
 !     seedsize=n_uvoirpellets*10+nctot*10
 ! last +10 in next line is for 'safety'
-      seedsize=4*(n_uvoirpellets+10)
-      allocate (nseeds(seedsize))
-      do i=1,seedsize
-        call random_number(z)
-        nseeds(i)=int(z*2147483579d0)
-      enddo
+!     seedsize=4*(n_uvoirpellets+10)
+!     allocate (nseeds(seedsize))
+!     do i=1,seedsize
+!       call random_number(z)
+!       nseeds(i)=int(z*2147483579d0)
+!     enddo
 
       return
       end subroutine init_uvoir
@@ -172,9 +172,9 @@
       REAL(8) :: tm0, TM1 , TM2 , TM3 , TM4 , TM5, tm6
 !     type(rng_t), allocatable :: rng(:)
       type(rng_t) :: rng
-      real(8) :: z(3),q
+      real(8) :: z(3),q, zz
       real(8) :: jnudnup(nctot),nujnudnup(nctot),edepp(nctot),escap(nctot)
-      integer :: ntracksp(nctot),nprobp,nleakp
+      integer :: ntracksp(nctot),nprobp,nleakp,nseeds(4)
       real(8) :: boloutp(Ntimes)
       real(8) :: uvoir_fp(Ntimes,8)
       INTEGER ::  NTHREADS, TID, OMP_GET_NUM_THREADS,OMP_GET_THREAD_NUM,numloop
@@ -292,7 +292,15 @@
 !                 call rng_seed(rng, 932117 + seedcount+(k-1)*nc1*nc2+(j-1)*nc1+(i-1))
 !                 myseednum=seedcount+(k-1)*nc1*nc2+(j-1)*nc1+(i-1)
 !                 call rng_seed(rng,nseeds(4*(myseednum-1)+1:4*myseednum))
-                  call rng_seed(rng,nseeds(4*(iphotons-1)+1:4*iphotons))
+                  call random_number(zz)
+                  nseeds(1)=int(zz*2147483579d0)
+                  call random_number(zz)
+                  nseeds(2)=int(zz*2147483579d0)
+                  call random_number(zz)
+                  nseeds(3)=int(zz*2147483579d0)
+                  call random_number(zz)
+                  nseeds(4)=int(zz*2147483579d0)
+                  call rng_seed(rng,nseeds)
                   photon(iphotons)=new_uvoir(nt,i,j,k,EpelletUvoir,rng)
                 enddo
               enddo
